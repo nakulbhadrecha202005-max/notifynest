@@ -82,5 +82,27 @@ Router.delete('/:id', Authproduct, async (req, res) => {
         return res.status(500).json({ message: "Server error" });
     }
 })
+
+Router.patch('/userprofileUpdate/:id', Authproduct, async (req, res) => {
+
+    try {
+        if (!req.user) {
+            return res.status(401).json({message:"User Not Found / UnAuthorised Access."})
+        }
+        const userId = req.params.id;
+        const { name } = req.body;
+        const updateByid_users = await User.findByIdAndUpdate(
+            userId,
+            { name },
+            { returnDocument: 'after' }
+        );
+        if (!updateByid_users) {
+            return res.status(404).json({message:"User Not Found / Existed."})
+        }
+        return res.status(200).json({message:"User Updated Successfully.", updatedUser: updateByid_users })
+    } catch (err) {
+        return res.status(500).json({ message: "Server error" });
+    }
+})
  
 module.exports = Router
