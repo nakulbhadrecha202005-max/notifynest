@@ -78,7 +78,15 @@ Routes.patch('/:id', Authproduct, async (req, res) => {
         // }
 
         const notificationId = req.params.id;
-
+        // const { message, priority, isActive } = req.body;
+        // const updateFields = {};
+        // if (message !== undefined) updateFields.message = message;
+        // if (priority !== undefined) updateFields.priority = priority;
+        
+        // // Explicitly handle the boolean evaluation of your toggle
+        // if (isActive !== undefined) {
+        //     updateFields.isActive = isActive === true || isActive === 'true';
+        // }
         const updatedNotification =
             await reminderSchema.findByIdAndUpdate(
                 notificationId,
@@ -88,6 +96,8 @@ Routes.patch('/:id', Authproduct, async (req, res) => {
                     runValidators: true
                 }
             );
+        
+        console.log(updatedNotification);
 
         if (!updatedNotification) {
             return res.status(404).json({
