@@ -16,10 +16,12 @@ const PORT = 5000
 app.use(bodyParser.json()) // required for fetching req.body email pass from frontend
 app.use(cors({
   origin: 'https://nestnotify.vercel.app',
-  // origin: 'http://localhost:5173/',
+  // origin: 'http://localhost:5173',
   credentials: true
 })) // server allowind different port
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
 app.use('/auth', AuthRouter)
 app.use('/products', ProductRouter)
 

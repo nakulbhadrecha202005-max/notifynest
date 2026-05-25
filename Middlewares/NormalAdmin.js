@@ -8,13 +8,13 @@ const NormalAdmin = async (req, res, next) => {
             message: "Unauthorized"
          });
       }
-      //console.log("Email : ", req.user.email)
+      // console.log("Email : ", req.user.email)
       const useremail = req.user.email;
       const admin = await AdminModel.findOne({
          email: useremail 
       })
       
-      //console.log("admin : ", admin);
+      // console.log("admin : ", admin);
       if(admin){
         const allNotifications = await reminderSchema.find();
             return res.status(200).json({
