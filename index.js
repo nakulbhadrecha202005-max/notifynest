@@ -17,7 +17,10 @@ app.use(bodyParser.json()) // required for fetching req.body email pass from fro
 app.use(cors({
   origin: 'https://nestnotify.vercel.app',
   // origin: 'http://localhost:5173',
-  credentials: true
+  credentials: true,
+  httpOnly: true,
+  secure: true,
+  sameSite: 'None'
 })) // server allowind different port
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
