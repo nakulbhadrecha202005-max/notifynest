@@ -4,61 +4,93 @@ const reminderSchema = require('../Models/reminderSchema')
 const Authproduct = require('../Middlewares/Authproduct')
 const AdminModel = require('../Models/Admin')
 const NormalAdmin = require('../Middlewares/NormalAdmin')
-Routes.get('/',  Authproduct , NormalAdmin , async (req, res) => {
-    try {
+// const cache = require('../Middlewares/cache')
+const ProtectCashingWare = require("../Middlewares/ProtectCashingWare")
+// const redisClient = require("../config/redis");
+Routes.get('/fetchNotificationsByAdmin' , Authproduct , NormalAdmin , async (req, res) => {
+    try { 
         // Normal user can access only their notifications
         const userNotifications = await reminderSchema.find({
             email: req.user.email
         });
+        console.log(userNotifications)
+        const responseData = {
+            success: true,
+            message:"User Data",
+            notifications: userNotifications
+        };
 
-        return res.status(200).json({
-            notifications: userNotifications,
-            message:
-                "You do not have Administrator permission to access all notifications. Showing only your notifications.",
-        });
+        return res.status(200).json(responseData);
         
     } catch (err) {
-        return res.status(500).json({message:"ServerDown or Error"})
+        return res.status(500).json({message: err.message})
     }
 })
 
-Routes.delete('/:id', Authproduct, async (req, res) => {
-    try {
+Routes.get('/GeneralUsers' , Authproduct , async (req, res) => {
+    try { 
+        // Normal user can access only their notifications
+        if (!req.user || !req.user.email) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "Unauthorized: User payload missing from request." 
+            });
+        } 
+        // console.log(req.user)
+        const userNotifications = await reminderSchema.findOne({
+            email: req.user.email
+        }); 
 
+        // console.log(userNotifications)
+
+        const responseData = {
+            success: true,
+            message: "User Data",
+            notifications: userNotifications
+        };
+
+
+        return res.status(200).json(responseData);
+        
+    } catch (err) {
+        // console.log("Error", err);
+        return res.status(500).json({message: err.message})
+    }
+})
+
+// Backend Route - Added missing response
+Routes.delete('/delete/:id', Authproduct, async (req, res) => {
+    try {
+   
         if (!req.user) {
             return res.status(401).json({
                 message: "Unauthorized Access to delete."
-            })
+            });
         }
 
-        // if (req.user.email !== "nakul@gmail.com") {
-        //     return res.status(403).json({
-        //         message: "Access Denied"
-        //     })
-        // }
+        const notification = await reminderSchema.findById(req.params.id);
 
-        const NotificationUsersId = req.params.id
-
-        const deletedNotification =
-            await reminderSchema.findByIdAndDelete(NotificationUsersId)
-
-        if (!deletedNotification) {
+        if (!notification) {
             return res.status(404).json({
-                message: "Notification Not Found."
-            })
+                message: "Notification not found."
+            });
         }
 
-        return res.status(200).json({
-            message: "Notification Deleted Successfully.",
-            deletedNotification
-        })
+        const deletedNotification = await reminderSchema.findByIdAndDelete(req.params.id);
+
+        const responseData = {
+            message: "Notification deleted successfully.",
+            notifications: deletedNotification
+        };
+        return res.status(200).json(responseData);
 
     } catch (err) {
+        console.error("DELETE ERROR:", err);
         return res.status(500).json({
-            message: "Server Down or Error"
-        })
+            message: err.message || "Internal Server Error during deletion."
+        });
     }
-})
+});
 
 Routes.patch('/:id', Authproduct, async (req, res) => {
     //console.log('---update notification details---', req.user)

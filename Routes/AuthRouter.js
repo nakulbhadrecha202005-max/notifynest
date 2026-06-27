@@ -6,7 +6,7 @@ const Router = router()
 
 const loginLimiter = require('../validationratelimit/loginLimiter')
 
-Router.post('/login', loginLimiter, login_validation , login)
+Router.post('/login', login_validation , login)
 Router.post('/signup', signup_validation , signup)
 
 module.exports = Router

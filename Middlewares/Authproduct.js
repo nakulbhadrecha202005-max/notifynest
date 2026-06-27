@@ -2,16 +2,13 @@ const jwt = require('jsonwebtoken')
 
 const Authproduct = (req, res, next) => {
   try {
-    // console.log('Authproduct middleware called')
     const auth = req.headers.authorization
 
-    // console.log('Authorization Header:', auth)
     if (!auth) {
       return res.status(403).json({
         message: 'UnAuthorised access, JWT Token required.'
       })
     }
-
     const token = auth.split(' ')[1]
     // console.log(token)
     if (!token) {
@@ -19,7 +16,7 @@ const Authproduct = (req, res, next) => {
         message: 'Token missing'
       })
     }
-    const decoded = jwt.verify(token, 'nakul1')
+    const decoded = jwt.verify(token, 'nakul1', { expiresIn: '100y' })
     // console.log(decoded)
     req.user = decoded
     next()

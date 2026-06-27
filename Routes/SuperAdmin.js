@@ -6,6 +6,7 @@ const fetchAllAdmin = require('../Controllers/fetchAllAdmin')
 const DeleteAdmin = require('../Controllers/DeleteAdmin')
 const loginLimiter = require('../validationratelimit/loginLimiter')
 const UpdateAdminEmail = require('../Controllers/UpdateAdminEmail')
+const cache = require('../Middlewares/cache')
 // Only admin can add admin
 router.post('/add-admin', Authproduct, AdminMiddleWare , addAdmin)
 router.get('/allAdminListfetch', Authproduct, AdminMiddleWare, fetchAllAdmin)

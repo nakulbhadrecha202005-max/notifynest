@@ -3,35 +3,44 @@ const User = require('../Models/Users')
 const Router = require('express').Router()
 const AdminModel = require('../Models/Admin')
 const AdminMiddleware = require('../Middlewares/Adminmiddleware')
-
+// const redisClient = require("../config/redis");
+// const cache = require('../Middlewares/cache')
 Router.get('/', Authproduct , async (req, res) => {
-    //console.log('----login users details----', req.user)
+    // console.log('----login users details----', req.user)
     try {
         if (!req.user) {
             return res.status(401).json({ message: "Unauthorized Access" });
         }
-        //console.log(req.user.email)
         const admin = await AdminModel.findOne({
                  email: req.user.email
         })
-        //console.log("admin : ",admin)
         if (admin) {
             const users = await User.find();
-            //console.log(users)
-            return res.status(200).json(users)
+            const responseData = {
+                success: true,
+                usersData: users
+            };
+            
+            return res.status(200).json(responseData);
         }
-        
+                
         const userEmail = await User.findOne({ email: req.user.email });    
+        // console.log(userEmail)
         if (userEmail) {
-             return res.status(200).json(userEmail)
+            const responseData = {
+                success: true,
+                usersData: userEmail
+            };
+            return res.status(200).json(responseData);
         }
         else {
             return res.status(403).json({ message: "Access Denied, not admin." });
-        }           
+        }
+ 
     } 
     catch (err)
     {
-        console.error(err);
+        // console.error(err);
         return res.status(500).json({ message: "Server error" });
   }
 })
@@ -73,13 +82,14 @@ Router.delete('/:id', Authproduct, async (req, res) => {
          if (!req.user) {
             return res.status(401).json({ message: "Unauthorized Access" });
         }
-        //console.log(req.user.email)
+        console.log(req.user.email)
         const admin = await AdminModel.findOne({
                  email: req.user.email
         })
+        let deleteByid_users;
         if (admin) {
             const userId = req.params.id;
-            const deleteByid_users = await User.findByIdAndDelete(userId);
+            deleteByid_users = await User.findByIdAndDelete(userId);
 
             if (!deleteByid_users) {
                 return res.status(404).json({ message: "User Not Found / Existed." })
@@ -91,9 +101,8 @@ Router.delete('/:id', Authproduct, async (req, res) => {
         return res.status(500).json({ message: "Server error" });
     }
 })
-
+    
 Router.patch('/userprofileUpdate/:id', Authproduct, async (req, res) => {
-
     try {
         if (!req.user) {
             return res.status(401).json({message:"User Not Found / UnAuthorised Access."})
@@ -132,5 +141,8 @@ Router.patch('/userprofileUpdate/:id', Authproduct, async (req, res) => {
         return res.status(500).json({ message: "Server error" });
     }
 })
- 
+
+const AdminUpdateAll = require('../Controllers/AdminUpdateAll');
+Router.put("/AdminUpdateUsers/:id", Authproduct, AdminUpdateAll);
+
 module.exports = Router

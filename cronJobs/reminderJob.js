@@ -3,7 +3,7 @@ const Cron = require("node-cron")
 
 const sendEmailLogic = require("../Utiles/sendEmail");
 
-Cron.schedule("* * * * *", async () => {
+Cron.schedule("* * * * *", async (req,res,next) => {
     // console.log("Checking reminders...")
     try {
         const reminder_fromDB = await Reminder.find({ isActive: true })  
